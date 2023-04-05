@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "@discordjs/opus": "^0.9.0",
+    "@discordjs/voice": "^0.15.0",
+    "@google-cloud/text-to-speech": "^4.2.1",
+    "discord.js": "^14.8.0",
+    "dotenv": "^16.0.3",
+    "libsodium-wrappers": "^0.7.11",
+    "openai": "^3.2.1",
+    "stream": "^0.0.2"
+  },
+  "scripts": {
+    "start": "node src/bot.js",
+    "register": "node register.js"
+  }
+}
