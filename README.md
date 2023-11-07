@@ -1,6 +1,6 @@
 # MohrkeGPT Bot
 
-A Discord bot powered by OpenAI GPT-4-turbo to answer questions, provide information, and read responses aloud in voice channels.
+A Discord bot powered by OpenAI GPT-4-turbo and Dall-e-3 to answer questions, generate images, and read responses aloud in voice channels.
 
 ## Prerequisites
 
@@ -23,16 +23,6 @@ A Discord bot powered by OpenAI GPT-4-turbo to answer questions, provide informa
 ## Usage
 
 The bot supports the following commands:
-
-### /ask
-
-Ask MohrkeGPT a question using the davinci003 API 
-
-Usage: `/ask question [--tts]`
-
-Arguments:
-- `question` (required): The question to ask MohrkeGPT.
-- `--tts` (optional): Read the response aloud in a voice channel.
 
 ### /say
 
@@ -59,6 +49,12 @@ Stop the audio
 
 Usage: `/stop`
 
+### /draw
+
+Draw an image using the Dall-e-3 API
+
+Usage: `/draw prompt``
+
 ### /clear
 
 Clear the conversation history
@@ -71,7 +67,6 @@ Usage: `/clear`
 - MohrkeGPT uses the following libraries:
   - [discord.js](https://discord.js.org)
   - [@discordjs/voice](https://www.npmjs.com/package/@discordjs/voice)
-  - [@google-cloud/text-to-speech](https://www.npmjs.com/package/@google-cloud/text-to-speech)
   - [openai](https://www.npmjs.com/package/openai)
 
 ## License
