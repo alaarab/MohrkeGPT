@@ -65,17 +65,16 @@ async function getDrawCompletion(prompt, interaction) {
   // Generate an Image with Dalle-3
   // Respond with an interaction who's content is the image
   try {
-
-    console.log(`Prompt1 is ${prompt}`)
-    const response = await openai.createImage({
+    console.log(`Prompt1 is ${prompt}`);
+    const response = await openai.images.generate({
       model: "dall-e-3",
-      prompt: prompt,
-      n: 1,
-      size: "1024x1024",
+      prompt,
+      size: "1024x1792",
+      quality: "standard"
     });
-    console.log(response);
 
-    let image_url = response.data.data[0].url;
+    let image_url = response.data[0].url;
+    let revised_prompt = response.data[0].revised_prompt;
 
     const gptEmbed = new EmbedBuilder()
       .setColor(0x0099ff)
@@ -85,13 +84,13 @@ async function getDrawCompletion(prompt, interaction) {
       })
       .addFields(
         { name: "Prompt", value: prompt },
-        { name: "Image", value: image_url }
+        { name: "Revised Prompt", value: revised_prompt }
       )
+      .setImage(image_url)
       .setTimestamp()
       .setFooter({
         text: "MohrkeGPT",
-        iconURL:
-          "https://cdn.discordapp.com/avatars/1090478092230864957/a68d50bb06045f0bb0041666d2a91573.png",
+        iconURL: "https://cdn.discordapp.com/avatars/1090478092230864957/a68d50bb06045f0bb0041666d2a91573.png",
       });
 
     await interaction.editReply({
@@ -102,10 +101,12 @@ async function getDrawCompletion(prompt, interaction) {
     return image_url;
 
   } catch (e) {
-    console.error(`Error getting GPT response: ${e}`);
+    console.error(`Error getting DALL-E response: ${e}`);
+    if (e.response) {
+      console.error(`Response body: ${JSON.stringify(e.response.body)}`);
+    }
     await interaction.editReply({
-      content:
-        "Sorry, I couldn't process your request. Please try again later.",
+      content: "Sorry, I couldn't process your request. Please try again later.",
       embeds: [],
     });
     return "Sorry, I couldn't process your request. Please try again later.";
