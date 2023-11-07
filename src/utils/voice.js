@@ -5,13 +5,10 @@ const {
   joinVoiceChannel,
 } = require("@discordjs/voice");
 const { Readable, Transform, pipeline } = require("stream");
-const { Configuration, OpenAIApi } = require("openai");
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const { OpenAI } = require('openai');
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, 
 });
-
-const openai = new OpenAIApi(configuration);
 
 let audioPlayer;
 let connection;

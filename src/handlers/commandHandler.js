@@ -1,29 +1,10 @@
 const {
   clearMessages,
-  getCompletion,
   getChatCompletion,
 } = require("../utils/gpt4");
 const { readAloud, stopAudio } = require("../utils/voice");
 
 const commands = [
-  {
-    name: "ask",
-    description: "Ask MohrkeGPT a question",
-    options: [
-      {
-        name: "question",
-        type: 3, // 3 is string
-        description: "The question to ask",
-        required: true,
-      },
-      {
-        name: "tts",
-        type: 5, // 5 is boolean
-        description: "Read the response aloud",
-        required: false,
-      },
-    ],
-  },
   {
     name: "chat",
     description: "Chat with MohrkeGPT",
@@ -78,11 +59,6 @@ const commands = [
 
 module.exports = {
   commands,
-  ask: async (interaction) => {
-    const question = interaction.options.getString("question");
-    const response = await getCompletion(question, interaction);
-    if(interaction.options.getBoolean("tts")) await readAloud(response, interaction);
-  },
   say: async (interaction) => {
     const text = interaction.options.getString("text");
     await interaction.editReply({ content: text, embeds: [] });

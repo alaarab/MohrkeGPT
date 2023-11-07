@@ -5,7 +5,7 @@
     "discord.js": "^14.8.0",
     "dotenv": "^16.0.3",
     "libsodium-wrappers": "^0.7.11",
-    "openai": "^3.2.1",
+    "openai": "^4.0.0",
     "stream": "^0.0.2"
   },
   "scripts": {
