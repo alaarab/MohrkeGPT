@@ -1,6 +1,6 @@
 # MohrkeGPT Bot
 
-A Discord bot powered by OpenAI GPT-3.5-turbo to answer questions, provide information, and read responses aloud in voice channels.
+A Discord bot powered by OpenAI GPT-4-turbo to answer questions, provide information, and read responses aloud in voice channels.
 
 ## Prerequisites
 
@@ -17,8 +17,6 @@ A Discord bot powered by OpenAI GPT-3.5-turbo to answer questions, provide infor
     - `OPENAI_API_KEY`: Your OpenAI API key
     - `DISCORD_BOT_KEY`: Your Discord bot token
     - `DISCORD_BOT_CLIENT_ID`: Your Discord bot client ID
-    - `GOOGLE_API_KEY`: Your Google API key
-    - `GOOGLE_APPLICATION_CREDENTIALS`: The path to your Google application credentials file
 4. Run `npm run register` to register the bot's commands with Discord.
 5. Run `npm run start` to start the bot.
 

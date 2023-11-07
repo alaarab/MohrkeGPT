@@ -2,7 +2,7 @@ const {
   clearMessages,
   getCompletion,
   getChatCompletion,
-} = require("../utils/gpt3");
+} = require("../utils/gpt4");
 const { readAloud, stopAudio } = require("../utils/voice");
 
 const commands = [
@@ -43,6 +43,18 @@ const commands = [
     ],
   },
   {
+    name: "draw",
+    description: "Draw with MohrkeGPT",
+    options: [
+      {
+        name: "prompt",
+        type: 3, // 3 is string
+        description: "Your draw prompt",
+        required: true,
+      },
+    ],
+  },
+  {
     name: "clear",
     description: "Clear the conversation history",
   },
@@ -75,6 +87,10 @@ module.exports = {
     const text = interaction.options.getString("text");
     await interaction.editReply({ content: text, embeds: [] });
     await readAloud(text, interaction);
+  },
+  draw: async (interaction) => {
+    const text = interaction.options.getString("text");
+    await interaction.editReply({ content: text, embeds: [] });
   },
   chat: async (interaction) => {
     const prompt = interaction.options.getString("prompt");

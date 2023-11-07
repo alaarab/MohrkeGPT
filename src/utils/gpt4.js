@@ -24,7 +24,7 @@ async function getChatCompletion(prompt, interaction) {
     messages.push({ role: "user", content: prompt });
 
     const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4-1106-preview",
       messages: messages,
       // max_tokens: 500,
     });

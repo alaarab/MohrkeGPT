@@ -5,8 +5,8 @@ const {
   joinVoiceChannel,
 } = require("@discordjs/voice");
 const { Readable, Transform, pipeline } = require("stream");
-const { TextToSpeechClient } = require("@google-cloud/text-to-speech");
-const client = new TextToSpeechClient();
+const { OpenAI, toFile } = require("openai");
+const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
 let audioPlayer;
 let connection;
@@ -49,21 +49,16 @@ async function readAloud(text, interaction) {
     const voiceChannel = interaction.member.voice.channel;
 
     try {
-      const request = {
-        input: { text },
-        voice: {
-          languageCode: "en-US",
-          // ssmlGender: "NEUTRAL",
-          name: "en-US-Neural2-A",
-        },
-        audioConfig: { audioEncoding: "OGG_OPUS" },
-      };
+      const speechResponse = await openai.audio.speech.create({
+        model: 'tts-1',
+        voice: 'alloy',
+        input: text,
+      });
 
-      const [response] = await client.synthesizeSpeech(request);
-
+      const audioBuffer = Buffer.from(await speechResponse.arrayBuffer());
       const audioStream = new Readable({
         read() {
-          this.push(response.audioContent);
+          this.push(audioBuffer);
           this.push(null);
         },
       });
