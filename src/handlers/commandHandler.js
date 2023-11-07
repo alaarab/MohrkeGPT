@@ -71,8 +71,6 @@ module.exports = {
   },
   chat: async (interaction) => {
     const prompt = interaction.options.getString("prompt");
-    console.log(prompt);
-    console.log(interaction);
     const response = await getChatCompletion(prompt, interaction);
     if (interaction.options.getBoolean("tts")) await readAloud(response, interaction);
   },
