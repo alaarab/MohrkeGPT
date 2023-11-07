@@ -2,6 +2,7 @@ const {
   clearMessages,
   getChatCompletion,
 } = require("../utils/gpt4");
+const messageHistory = require('../utils/messageHistory');
 const { readAloud, stopAudio } = require("../utils/voice");
 
 const commands = [
@@ -70,13 +71,16 @@ module.exports = {
   },
   chat: async (interaction) => {
     const prompt = interaction.options.getString("prompt");
+    console.log(prompt);
+    console.log(interaction);
     const response = await getChatCompletion(prompt, interaction);
-    if(interaction.options.getBoolean("tts")) await readAloud(response, interaction);
+    if (interaction.options.getBoolean("tts")) await readAloud(response, interaction);
   },
   stop: async (interaction) => {
     await stopAudio(interaction);
   },
   clear: async (interaction) => {
-    await clearMessages(interaction);
+    messageHistory.clearUserHistory(interaction.user.id); // Clear history for this user
+    await interaction.editReply({ content: "Your conversation history has been cleared.", embeds: [] });
   },
 };
