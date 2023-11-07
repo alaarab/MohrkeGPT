@@ -61,6 +61,58 @@ async function getChatCompletion(prompt, interaction) {
   }
 }
 
+async function getDrawCompletion(prompt, interaction) {
+  // Generate an Image with Dalle-3
+  // Respond with an interaction who's content is the image
+  try {
+
+    console.log(`Prompt1 is ${prompt}`)
+    const response = await openai.createImage({
+      model: "dall-e-3",
+      prompt: prompt,
+      n: 1,
+      size: "1024x1024",
+    });
+    console.log(response);
+
+    let image_url = response.data.data[0].url;
+
+    const gptEmbed = new EmbedBuilder()
+      .setColor(0x0099ff)
+      .setAuthor({
+        name: interaction.user.username,
+        iconURL: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`,
+      })
+      .addFields(
+        { name: "Prompt", value: prompt },
+        { name: "Image", value: image_url }
+      )
+      .setTimestamp()
+      .setFooter({
+        text: "MohrkeGPT",
+        iconURL:
+          "https://cdn.discordapp.com/avatars/1090478092230864957/a68d50bb06045f0bb0041666d2a91573.png",
+      });
+
+    await interaction.editReply({
+      content: "",
+      embeds: [gptEmbed],
+    });
+
+    return image_url;
+
+  } catch (e) {
+    console.error(`Error getting GPT response: ${e}`);
+    await interaction.editReply({
+      content:
+        "Sorry, I couldn't process your request. Please try again later.",
+      embeds: [],
+    });
+    return "Sorry, I couldn't process your request. Please try again later.";
+  }
+}
+
 module.exports = {
   getChatCompletion,
+  getDrawCompletion
 };

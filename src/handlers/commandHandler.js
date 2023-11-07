@@ -1,6 +1,7 @@
 const {
   clearMessages,
   getChatCompletion,
+  getDrawCompletion
 } = require("../utils/gpt4");
 const messageHistory = require('../utils/messageHistory');
 const { readAloud, stopAudio } = require("../utils/voice");
@@ -66,11 +67,12 @@ module.exports = {
     await readAloud(text, interaction);
   },
   draw: async (interaction) => {
-    const text = interaction.options.getString("text");
-    await interaction.editReply({ content: text, embeds: [] });
+    const prompt = interaction.options.getString("prompt");
+    const response = await getDrawCompletion(prompt, interaction);
   },
   chat: async (interaction) => {
     const prompt = interaction.options.getString("prompt");
+    console.log(`prompt is ${prompt}`);
     const response = await getChatCompletion(prompt, interaction);
     if (interaction.options.getBoolean("tts")) await readAloud(response, interaction);
   },
