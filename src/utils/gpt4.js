@@ -69,7 +69,7 @@ async function getDrawCompletion(prompt, interaction) {
     const response = await openai.images.generate({
       model: "dall-e-3",
       prompt,
-      size: "1024x1792",
+      size: "1024x1024",
       quality: "standard"
     });
 
