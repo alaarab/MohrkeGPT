@@ -4,40 +4,20 @@ const {
   AudioPlayerStatus,
   joinVoiceChannel,
 } = require("@discordjs/voice");
-const { Readable, Transform, pipeline } = require("stream");
-const { OpenAI } = require('openai');
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, 
-});
+const { Readable } = require("stream");
+const { OpenAI } = require("openai");
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 let audioPlayer;
 let connection;
-
-class AppendSilence extends Transform {
-  constructor(options) {
-    super(options);
-  }
-
-  _transform(chunk, encoding, callback) {
-    callback(null, chunk);
-  }
-
-  _flush(callback) {
-    const silenceBuffer = Buffer.alloc(2000);
-    this.push(silenceBuffer);
-    callback();
-  }
-}
 
 async function stopAudio(interaction) {
   if (audioPlayer) {
     audioPlayer.stop();
   }
-
   if (connection) {
     connection.destroy();
   }
-
   await interaction.editReply({
     content: "Audio stopped.",
     embeds: [],
@@ -45,71 +25,67 @@ async function stopAudio(interaction) {
 }
 
 async function readAloud(text, interaction) {
-  const userId = interaction.user.id;
-
   if (interaction.member.voice.channel) {
-    const voiceChannel = interaction.member.voice.channel;
-
     try {
-      const speechResponse = await openai.audio.speech.create({
-        model: 'tts-1',
-        voice: 'alloy',
+      const response = await openai.audio.speech.create({
+        model: "tts-1",
+        voice: "alloy",
         input: text,
       });
 
-      const audioBuffer = Buffer.from(await speechResponse.arrayBuffer());
-      const audioStream = new Readable({
+      const audioBuffer = Buffer.from(await response.arrayBuffer());
+
+      // Wrap Buffer into a stream and ensure all data is flushed
+      const readableStream = new Readable({
         read() {
           this.push(audioBuffer);
           this.push(null);
         },
       });
 
-      const silence = new AppendSilence();
-      const output = new Readable().wrap(
-        pipeline(audioStream, silence, (err) => {
-          if (err) {
-            console.error("Pipeline error:", err);
-          }
-        })
-      );
-
-      const resource = createAudioResource(output);
-      const newPlayer = createAudioPlayer();
-      audioPlayer = newPlayer;
-
-      const newConnection = await joinVoiceChannel({
-        channelId: voiceChannel.id,
-        guildId: voiceChannel.guild.id,
-        adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+      const resource = createAudioResource(readableStream, {
+        inlineVolume: true, // Optional: Adjust volume if needed
       });
-      connection = newConnection;
 
-      newConnection.subscribe(newPlayer);
-      newPlayer.play(resource);
-
-      newPlayer.on(AudioPlayerStatus.Idle, () => {
-        connection.destroy();
-        newPlayer.stop();
+      audioPlayer = createAudioPlayer();
+      connection = await joinVoiceChannel({
+        channelId: interaction.member.voice.channel.id,
+        guildId: interaction.guild.id,
+        adapterCreator: interaction.guild.voiceAdapterCreator,
       });
-    } catch (e) {
+
+      connection.subscribe(audioPlayer);
+      audioPlayer.play(resource);
+
+      // Listen for playback completion and ensure cleanup
+      audioPlayer.on(AudioPlayerStatus.Idle, () => {
+        if (connection) {
+          connection.destroy();
+          connection = null;
+        }
+        if (audioPlayer) {
+          audioPlayer.stop();
+          audioPlayer = null;
+        }
+      });
+
+      // Debugging: Log when playback starts
+      audioPlayer.on(AudioPlayerStatus.Playing, () => {
+        console.log("Audio is playing");
+      });
+
+    } catch (error) {
+      console.error("Error in TTS:", error);
       await interaction.editReply({
-        content:
-          "Sorry, I couldn't read the response aloud. Please try again later.",
+        content: "Couldn't read the response aloud. Try again.",
         embeds: [],
       });
-      console.error(`Error reading aloud: ${e}`);
     }
   } else {
     await interaction.editReply({
-      content:
-        "You must be in a voice channel for the bot to read the response aloud.",
-      embeds: [],
+      content: "Join a voice channel to hear the bot.",
     });
   }
 }
 
-module.exports = {
-  readAloud,
-  stopAudio,
-};
+module.exports = { readAloud, stopAudio };

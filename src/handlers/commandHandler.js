@@ -9,7 +9,7 @@ const { readAloud, stopAudio } = require("../utils/voice");
 const commands = [
   {
     name: "chat",
-    description: "Chat with MohrkeGPT",
+    description: "Chat with HellGPT-Q",
     options: [
       {
         name: "prompt",
@@ -27,7 +27,7 @@ const commands = [
   },
   {
     name: "draw",
-    description: "Draw with MohrkeGPT",
+    description: "Draw with HellGPT-Q",
     options: [
       {
         name: "prompt",
@@ -43,7 +43,7 @@ const commands = [
   },
   {
     name: "say",
-    description: "Tell MohrkeGPT to say something",
+    description: "Tell HellGPT-Q to say something",
     options: [
       {
         name: "text",

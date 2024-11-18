@@ -1,4 +1,4 @@
-# MohrkeGPT Bot
+# HellGPT-Q Bot
 
 A Discord bot powered by OpenAI GPT-4-turbo and Dall-e-3 to answer questions, generate images, and read responses aloud in voice channels.
 
@@ -26,16 +26,16 @@ The bot supports the following commands:
 
 ### /say
 
-Tell MohrkeGPT to say something
+Tell HellGPT-Q to say something
 
 Usage: `/say text`
 
 Arguments:
-- `text` (required): The text that MohrkeGPT should say.
+- `text` (required): The text that HellGPT-Q should say.
 
 ### /chat
 
-Chat with MohrkeGPT using the GPT Turbo 3.5 API 
+Chat with HellGPT-Q using the GPT Turbo 3.5 API 
 
 Usage: `/chat prompt [--tts]`
 
@@ -63,12 +63,12 @@ Usage: `/clear`
 
 ## Credits
 
-- MohrkeGPT was created by Ala Arab
-- MohrkeGPT uses the following libraries:
+- HellGPT-Q was created by Ala Arab
+- HellGPT-Q uses the following libraries:
   - [discord.js](https://discord.js.org)
   - [@discordjs/voice](https://www.npmjs.com/package/@discordjs/voice)
   - [openai](https://www.npmjs.com/package/openai)
 
 ## License
 
-MohrkeGPT is licensed under the [MIT License](LICENSE).
+HellGPT-Q is licensed under the [MIT License](LICENSE).
