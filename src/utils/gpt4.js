@@ -1,6 +1,7 @@
 const dotenv = require("dotenv");
 const { EmbedBuilder } = require("discord.js");
 const OpenAI = require("openai");
+const { get_encoding } = require("tiktoken"); // Correct method for token counting
 const messageHistory = require("./messageHistory");
 
 dotenv.config();
@@ -15,7 +16,11 @@ setInterval(() => {
 }, 600000);
 
 function estimateTokenCount(messages) {
-  return messages.reduce((count, msg) => count + Math.ceil(msg.content.length / 4), 0);
+  const encoding = get_encoding("cl100k_base"); // Use appropriate encoding for the model
+  const joinedContent = messages.map((msg) => msg.content).join(" ");
+  const tokenCount = encoding.encode(joinedContent).length;
+  encoding.free(); // Free resources when done
+  return tokenCount;
 }
 
 async function getChatCompletion(prompt, interaction) {
@@ -25,7 +30,7 @@ async function getChatCompletion(prompt, interaction) {
 
     const messages = messageHistory.getMessages(userId);
 
-    // Ensure messages don't exceed a certain token limit
+    // Ensure messages don't exceed the context length limit (128,000 tokens for GPT-4o)
     while (messages.length > 0 && estimateTokenCount(messages) > 128000) {
       messages.shift();
     }
@@ -33,6 +38,7 @@ async function getChatCompletion(prompt, interaction) {
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
+      max_tokens: 8192, // Ensure response fits within token limit
     });
 
     const responseData = response.choices[0].message.content;
@@ -51,8 +57,7 @@ async function getChatCompletion(prompt, interaction) {
       .setTimestamp()
       .setFooter({
         text: "HellGPT-Q",
-        iconURL:
-          "https://cdn.discordapp.com/avatars/1090478092230864957/a68d50bb06045f0bb0041666d2a91573.png",
+        iconURL: "https://cdn.discordapp.com/avatars/1090478092230864957/a68d50bb06045f0bb0041666d2a91573.png",
       });
 
     await interaction.editReply({
@@ -64,7 +69,7 @@ async function getChatCompletion(prompt, interaction) {
   } catch (error) {
     console.error(`Error getting GPT response: ${error.message}`);
     if (error.response) {
-      console.error(`Response data: ${JSON.stringify(error.response)}`);
+      console.error(`Response data: ${JSON.stringify(error.response.data)}`);
     }
     await interaction.editReply({
       content: "Sorry, I couldn't process your request. Please try again later.",
@@ -111,7 +116,7 @@ async function getDrawCompletion(prompt, interaction) {
   } catch (error) {
     console.error(`Error generating image: ${error.message}`);
     if (error.response) {
-      console.error(`Response data: ${JSON.stringify(error.response)}`);
+      console.error(`Response data: ${JSON.stringify(error.response.data)}`);
     }
     await interaction.editReply({
       content: "Sorry, I couldn't process your request. Please try again later.",

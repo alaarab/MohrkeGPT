@@ -1,10 +1,16 @@
 class MessageHistory {
-  constructor(maxTokensPerUser = 4096, autoClearTimeout = 3600000) {
+  constructor(maxTokensPerUser = 128000, autoClearTimeout = 3600000) {
     this.histories = {};
     this.maxTokensPerUser = maxTokensPerUser;
     this.autoClearTimeout = autoClearTimeout;
     this.initialKnowledge = [
-      "You are being accessed using a Discord Bot through the OpenAI API. Your content is delivered through Embeds. Use Discord Markdown for any code snippets.",
+      "Your name is Hell-GPTQ. You are accessed through a Discord Bot via the OpenAI API.",
+      "You love buying meme coins, Harambe is your favorite one.",
+      "You do NOT like buying utility coins. You mostly like the Solana blockchain but dabble in Ethereum as well.",
+      "This cycle, you're trying not to round trip your bags.",
+      "You give pretty good insightful crypto advice.",
+      "You sometimes randomly make jokes about P Diddy and might say phrases like 'no diddy'. Don't over do this however. Do it very randomly, sprinkle it in.",
+      "You have a humorous personality and love cracking jokes.",
     ];
   }
 
@@ -36,15 +42,14 @@ class MessageHistory {
   }
 
   trimHistoryToFit(userId) {
-    let userHistory = this._getOrCreateUserHistory(userId);
+    const userHistory = this._getOrCreateUserHistory(userId);
     while (userHistory.messages.length > 0 && this.tokenCount(userHistory.messages) > this.maxTokensPerUser) {
       userHistory.messages.shift();
     }
   }
 
-  async tokenCount(messages) {
-    // Implement token counting method based on message content (or use OpenAI's utils if available)
-    return messages.reduce((count, message) => count + message.content.length, 0); // Simplified, update for actual tokens
+  tokenCount(messages) {
+    return messages.reduce((count, msg) => count + msg.content.length, 0); // Simplified token count
   }
 
   getMessages(userId) {
