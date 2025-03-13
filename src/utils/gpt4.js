@@ -35,13 +35,46 @@ async function getChatCompletion(prompt, interaction) {
       messages.shift();
     }
 
-    const response = await openai.chat.completions.create({
+    // Format the input for the responses API
+    const formattedInput = messages.map(msg => {
+      if (msg.role === "system") {
+        return { instructions: msg.content };
+      }
+      return msg.content;
+    }).join("\n\n");
+
+    const response = await openai.responses.create({
       model: "gpt-4o",
-      messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
-      max_tokens: 8192, // Ensure response fits within token limit
+      input: formattedInput,
+      instructions: messages.find(msg => msg.role === "system")?.content,
+      temperature: 1.0,
+      text: {
+        format: {
+          type: "text"
+        }
+      },
+      tools: [
+        {
+          "type": "web_search_preview"
+        }
+      ],
+      tool_choice: "auto"  // Let the model decide when to use web search
     });
 
-    const responseData = response.choices[0].message.content;
+    // Debug log to see the response structure
+    console.log('OpenAI Response:', JSON.stringify(response, null, 2));
+
+    // Handle the response based on its status
+    if (response.status !== 'completed') {
+      throw new Error(`Response status: ${response.status}`);
+    }
+
+    // Extract the response text from the output messages
+    const responseData = response.output.find(output => output.type === 'message')?.content[0]?.text;
+    if (!responseData) {
+      throw new Error('No text response found in the output');
+    }
+
     messageHistory.addAssistantMessage(userId, responseData);
 
     const gptEmbed = new EmbedBuilder()
